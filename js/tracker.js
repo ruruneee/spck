@@ -244,6 +244,13 @@ if (user) {
     searchTimer = window.setTimeout(() => runSearch(query), 250);
   });
 
+  const initialSearch = new URLSearchParams(window.location.search).get("level");
+  if (initialSearch) {
+    searchInput.value = initialSearch;
+    runSearch(initialSearch);
+    document.querySelector(".search-panel").scrollIntoView({ behavior: "smooth" });
+  }
+
   completedInput.addEventListener("change", () => {
     progressInput.disabled = completedInput.checked;
     progressInput.required = !completedInput.checked;

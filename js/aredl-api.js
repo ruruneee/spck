@@ -75,3 +75,10 @@ export async function searchLevels(query, limit = 30) {
     .filter((level) => level.name.toLocaleLowerCase().includes(needle) || level.levelId.includes(needle))
     .slice(0, limit);
 }
+
+export async function getTopLevels(limit = 150) {
+  const levels = await loadLevels();
+  return levels
+    .filter((level) => level.position > 0 && level.position <= limit)
+    .sort((a, b) => a.position - b.position);
+}

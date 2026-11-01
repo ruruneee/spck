@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <title>Top 150 · GDTrack</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/list.js"></script>
+  </head>
+  <body data-page="list">
+    <header class="topbar">
+      <a class="brand" href="tracker.html">
+        <span class="brand-mark" aria-hidden="true">GD</span>
+        <span>GDTrack</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a data-nav-page="tracker" href="tracker.html">Tracker</a>
+        <a data-nav-page="list" href="list.html">List</a>
+        <a data-nav-page="account" href="account.html">Account</a>
+      </nav>
+      <div class="user-menu">
+        <span class="user-greeting">Hi, <strong data-current-username></strong></span>
+        <button class="button button--quiet button--small" type="button" data-signout>Sign out</button>
+      </div>
+    </header>
+
+    <main class="page-shell list-shell">
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">ALL RATED EXTREME DEMON LIST</p>
+          <h1>Top 150</h1>
+          <p class="muted">Browse the current AREDL main list and find a level to track.</p>
+        </div>
+        <span class="source-badge">LIVE AREDL DATA</span>
+      </section>
+
+      <section class="panel list-panel" aria-labelledby="top-list-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="top-list-title">Current rankings</h2>
+            <p class="muted" data-list-status aria-live="polite">Loading the current top 150…</p>
+          </div>
+          <span class="count-badge">150 levels</span>
+        </div>
+        <label class="search-box list-search" for="top-list-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="top-list-search" type="search" autocomplete="off" placeholder="Filter by level name or in-game ID">
+        </label>
+        <div class="empty-state" data-list-error hidden>
+          <span class="empty-icon" aria-hidden="true">!</span>
+          <h3>Couldn’t load the AREDL list</h3>
+          <p data-list-error-message></p>
+        </div>
+        <div class="top-level-list" data-top-level-list aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">Current ranks and level details provided by the <a href="https://aredl.net" target="_blank" rel="noreferrer">All Rated Extreme Demon List</a>. Thumbnails use verification video previews when available.</footer>
+  </body>
+</html>
