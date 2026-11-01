@@ -23,12 +23,20 @@ if (user) {
 
   function updateStats() {
     const completed = tracked.filter((item) => item.completed).length;
+    const listCompleted = tracked.filter((item) => item.completed && item.position > 0 && item.position <= 150).length;
+    const hardest = tracked
+      .filter((item) => item.completed && item.position > 0)
+      .sort((a, b) => a.position - b.position)[0];
     const average = tracked.length
       ? Math.round(tracked.reduce((total, item) => total + item.progress, 0) / tracked.length)
       : 0;
     document.querySelector("[data-stat-total]").textContent = tracked.length;
     document.querySelector("[data-stat-completed]").textContent = completed;
     document.querySelector("[data-stat-average]").textContent = `${average}%`;
+    document.querySelector("[data-stat-hardest]").textContent = hardest
+      ? `#${hardest.position} ${hardest.name}`
+      : "—";
+    document.querySelector("[data-stat-list-completion]").textContent = `${listCompleted} / 150`;
     document.querySelector("[data-list-count]").textContent = `${tracked.length} ${tracked.length === 1 ? "level" : "levels"}`;
     emptyState.hidden = tracked.length > 0;
   }

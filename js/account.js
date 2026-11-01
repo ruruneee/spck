@@ -13,9 +13,16 @@ if (user) {
   profileForm.addEventListener("submit", (event) => {
     event.preventDefault();
     try {
-      const username = String(new FormData(profileForm).get("username")).trim();
+      const formData = new FormData(profileForm);
+      if (String(formData.get("currentPassword")) !== user.password) {
+        throw new Error("Current password is incorrect.");
+      }
+
+      const username = String(formData.get("username")).trim();
       updateUser(user.email, { username });
+      user.username = username;
       document.querySelector("[data-current-username]").textContent = username;
+      profileForm.elements.currentPassword.value = "";
       showMessage(profileMessage, "Username saved.", "success");
     } catch (error) {
       showMessage(profileMessage, error.message);
@@ -25,9 +32,15 @@ if (user) {
   passwordForm.addEventListener("submit", (event) => {
     event.preventDefault();
     try {
-      const password = String(new FormData(passwordForm).get("password"));
+      const formData = new FormData(passwordForm);
+      if (String(formData.get("currentPassword")) !== user.password) {
+        throw new Error("Current password is incorrect.");
+      }
+
+      const password = String(formData.get("password"));
       if (password.length < 4) throw new Error("Your password must be at least 4 characters.");
       updateUser(user.email, { password });
+      user.password = password;
       passwordForm.reset();
       showMessage(passwordMessage, "Password updated.", "success");
     } catch (error) {
