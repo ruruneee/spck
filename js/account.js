@@ -1,4 +1,4 @@
-import { requireAuth, showMessage } from "../Main.js";
+import { requireAuth, showMessage } from "./Main.js";
 import { updateUser } from "./storage.js";
 
 const user = requireAuth();

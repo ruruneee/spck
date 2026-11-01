@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#ffffff">
     <title>Tracker · GDTrack</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script type="module" src="js/tracker.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <script type="module" src="../js/tracker.js"></script>
   </head>
   <body data-page="tracker">
     <header class="topbar">
@@ -28,9 +28,7 @@
     <main class="page-shell">
       <section class="page-heading">
         <div>
-          <p class="eyebrow">YOUR PERSONAL LEVEL LIST</p>
           <h1>Tracker</h1>
-          <p class="muted">Keep an eye on the levels you’re working toward.</p>
         </div>
       </section>
 
@@ -53,14 +51,11 @@
         <div class="section-heading">
           <div>
             <h2 id="search-title">Find a level</h2>
-            <p class="muted">Search the AREDL level list by name or in-game ID.</p>
           </div>
-          <span class="source-badge">AREDL API</span>
         </div>
         <label class="search-box" for="level-search">
           <span aria-hidden="true">⌕</span>
           <input id="level-search" type="search" autocomplete="off" placeholder="Try “Tidal Wave” or a level ID">
-          <span class="search-shortcut">AREDL</span>
         </label>
         <p class="inline-status" data-search-status aria-live="polite">Start typing to search the level list.</p>
         <div class="level-results" data-search-results aria-live="polite"></div>
@@ -70,14 +65,12 @@
         <div class="section-heading">
           <div>
             <h2 id="tracked-title">Your levels</h2>
-            <p class="muted">Update progress whenever you make a new record.</p>
           </div>
           <span class="count-badge" data-list-count>0 levels</span>
         </div>
         <div class="empty-state" data-empty-state>
           <span class="empty-icon" aria-hidden="true">↗</span>
-          <h3>Your list is ready when you are</h3>
-          <p>Search for a level above and add it to start tracking your progress.</p>
+          <h3>No levels tracked yet</h3>
         </div>
         <div class="tracked-list" data-tracked-list></div>
       </section>
@@ -87,11 +80,9 @@
       <form class="form-stack" data-progress-form>
         <div class="dialog-heading">
           <div>
-            <p class="eyebrow">UPDATE YOUR RECORD</p>
             <h2 id="dialog-title">Level progress</h2>
             <p class="muted" data-dialog-level></p>
           </div>
-          <button class="icon-button" type="button" data-close-dialog aria-label="Close dialog">×</button>
         </div>
         <div class="dialog-level-info" data-dialog-info></div>
         <label for="progress-percent">Best progress (%)</label>
@@ -111,6 +102,5 @@
       </form>
     </dialog>
 
-    <footer class="site-footer">Level rank, verifier and victor count provided by the <a href="https://aredl.net" target="_blank" rel="noreferrer">All Rated Extreme Demon List</a>. Thumbnails use verification video previews when available.</footer>
   </body>
 </html>

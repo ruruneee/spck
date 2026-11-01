@@ -18,7 +18,7 @@ function getVideoThumbnail(videoUrl) {
     const videoId = url.hostname === "youtu.be"
       ? url.pathname.slice(1)
       : url.searchParams.get("v");
-    return videoId ? `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg` : null;
+    return videoId ? `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg` : null;
   } catch {
     return null;
   }

@@ -1,4 +1,4 @@
-import { requireAuth, showMessage } from "../Main.js";
+import { requireAuth, showMessage } from "./Main.js";
 import { getLevelDetails, searchLevels } from "./aredl-api.js";
 import { getProgress, saveProgress } from "./storage.js";
 
@@ -116,7 +116,7 @@ if (user) {
   function createThumbnail(level, variant) {
     const wrapper = document.createElement("div");
     wrapper.className = `level-thumbnail level-thumbnail--${variant}`;
-    wrapper.setAttribute("aria-label", level.thumbnail ? `${level.name} verification video thumbnail` : `${level.name} thumbnail unavailable`);
+    wrapper.setAttribute("aria-label", `${level.name} verification video thumbnail`);
 
     const fallback = document.createElement("span");
     fallback.textContent = "GD";
@@ -126,7 +126,7 @@ if (user) {
       const image = document.createElement("img");
       image.src = level.thumbnail;
       image.alt = `${level.name} verification video preview`;
-      image.loading = "lazy";
+      image.loading = variant === "search" ? "eager" : "lazy";
       image.addEventListener("error", () => image.remove(), { once: true });
       wrapper.append(image);
     }
@@ -167,6 +167,30 @@ if (user) {
     });
   }
 
+  function loadSearchDetails(levels, query) {
+    levels.forEach((level) => {
+      getLevelDetails(level)
+        .then((details) => {
+          Object.assign(level, details);
+
+          if (tracked.some((item) => item.id === level.id)) {
+            tracked = tracked.map((item) => item.id === level.id ? { ...item, ...details } : item);
+            saveProgress(user.email, tracked);
+            renderTracked();
+          }
+
+          if (searchInput.value.trim() === query && lastResults.some((item) => item.id === level.id)) {
+            renderSearchResults(lastResults);
+          }
+        })
+        .catch((error) => {
+          if (searchInput.value.trim() === query) {
+            searchStatus.textContent = `Some level details could not be loaded: ${error.message}`;
+          }
+        });
+    });
+  }
+
   async function runSearch(query) {
     if (query.trim().length < 2) {
       searchResults.replaceChildren();
@@ -179,6 +203,7 @@ if (user) {
       const levels = await searchLevels(query);
       if (searchInput.value.trim() !== query.trim()) return;
       renderSearchResults(levels);
+      loadSearchDetails(levels, query.trim());
       searchStatus.textContent = levels.length
         ? `${levels.length} result${levels.length === 1 ? "" : "s"} shown${levels.length === 30 ? " (showing the first 30)" : ""}.`
         : "No matching levels found.";
@@ -248,7 +273,7 @@ if (user) {
   if (initialSearch) {
     searchInput.value = initialSearch;
     runSearch(initialSearch);
-    document.querySelector(".search-panel").scrollIntoView({ behavior: "smooth" });
+    document.querySelector(".search-panel").scrollIntoView();
   }
 
   completedInput.addEventListener("change", () => {
@@ -281,7 +306,7 @@ if (user) {
     dialog.close();
   });
 
-  document.querySelectorAll("[data-close-dialog], [data-cancel-dialog]").forEach((button) => {
+  document.querySelectorAll("[data-cancel-dialog]").forEach((button) => {
     button.addEventListener("click", () => dialog.close());
   });
 

@@ -1,5 +1,5 @@
 import { clearSession, createUser, getCurrentUser, signIn } from "./storage.js";
-import { clearMessage, showMessage } from "../Main.js";
+import { clearMessage, showMessage } from "./Main.js";
 
 const loginForm = document.querySelector("[data-login-form]");
 const signupForm = document.querySelector("[data-signup-form]");

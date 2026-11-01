@@ -1,4 +1,4 @@
-import { requireAuth } from "../Main.js";
+import { requireAuth } from "./Main.js";
 import { getLevelDetails, getTopLevels } from "./aredl-api.js";
 
 if (requireAuth()) {
@@ -25,15 +25,19 @@ if (requireAuth()) {
       .then((details) => {
         Object.assign(level, details);
         const thumbnail = card.querySelector(".level-thumbnail");
-        thumbnail.setAttribute("aria-label", level.thumbnail ? `${level.name} verification video thumbnail` : `${level.name} thumbnail unavailable`);
+        thumbnail.setAttribute("aria-label", `${level.name} verification video thumbnail`);
 
         if (level.thumbnail) {
+          thumbnail.querySelector("span:not(.top-level-rank)")?.remove();
           const image = document.createElement("img");
           image.src = level.thumbnail;
           image.alt = `${level.name} verification video preview`;
           image.loading = "lazy";
           image.addEventListener("error", () => image.remove(), { once: true });
           thumbnail.append(image);
+        } else {
+          const fallback = thumbnail.querySelector("span:not(.top-level-rank)");
+          if (fallback) fallback.textContent = "GD";
         }
 
         const facts = card.querySelector(".level-facts");
@@ -61,8 +65,8 @@ if (requireAuth()) {
 
     const thumbnail = document.createElement("div");
     thumbnail.className = "level-thumbnail level-thumbnail--list";
-    thumbnail.setAttribute("aria-label", `${level.name} thumbnail loading`);
-    thumbnail.append(makeTextElement("span", "", "GD"));
+    thumbnail.setAttribute("aria-label", `${level.name} verification video thumbnail`);
+    thumbnail.append(makeTextElement("span", "", "Loading thumbnail…"));
 
     const rank = makeTextElement("span", "top-level-rank", `#${level.position}`);
     thumbnail.append(rank);
@@ -99,7 +103,7 @@ if (requireAuth()) {
 
     statusElement.textContent = query
       ? `${visibleLevels.length} of ${levels.length} levels match your search.`
-      : `Showing the current top ${levels.length} levels, ordered by AREDL rank.`;
+      : `${levels.length} levels`;
   }
 
   searchInput.addEventListener("input", renderLevels);

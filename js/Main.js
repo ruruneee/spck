@@ -1,4 +1,4 @@
-import { clearSession, getCurrentUser } from "./js/storage.js";
+import { clearSession, getCurrentUser } from "./storage.js";
 
 export function requireAuth() {
   const user = getCurrentUser();
