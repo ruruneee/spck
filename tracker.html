@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <title>Tracker · GDTrack</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/tracker.js"></script>
+  </head>
+  <body data-page="tracker">
+    <header class="topbar">
+      <a class="brand" href="tracker.html">
+        <span class="brand-mark" aria-hidden="true">GD</span>
+        <span>GDTrack</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a data-nav-page="tracker" href="tracker.html">Tracker</a>
+        <a data-nav-page="account" href="account.html">Account</a>
+      </nav>
+      <div class="user-menu">
+        <span class="user-greeting">Hi, <strong data-current-username></strong></span>
+        <button class="button button--quiet button--small" type="button" data-signout>Sign out</button>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">YOUR PERSONAL LEVEL LIST</p>
+          <h1>Tracker</h1>
+          <p class="muted">Keep an eye on the levels you’re working toward.</p>
+        </div>
+      </section>
+
+      <section class="stats-grid" aria-label="Progress summary">
+        <article class="stat-card">
+          <span class="stat-label">Levels tracked</span>
+          <strong data-stat-total>0</strong>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Completed</span>
+          <strong data-stat-completed>0</strong>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Average progress</span>
+          <strong data-stat-average>0%</strong>
+        </article>
+      </section>
+
+      <section class="panel search-panel" aria-labelledby="search-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="search-title">Find a level</h2>
+            <p class="muted">Search the AREDL level list by name or in-game ID.</p>
+          </div>
+          <span class="source-badge">AREDL API</span>
+        </div>
+        <label class="search-box" for="level-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="level-search" type="search" autocomplete="off" placeholder="Try “Tidal Wave” or a level ID">
+          <span class="search-shortcut">AREDL</span>
+        </label>
+        <p class="inline-status" data-search-status aria-live="polite">Start typing to search the level list.</p>
+        <div class="level-results" data-search-results aria-live="polite"></div>
+      </section>
+
+      <section class="panel tracker-panel" aria-labelledby="tracked-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="tracked-title">Your levels</h2>
+            <p class="muted">Update progress whenever you make a new record.</p>
+          </div>
+          <span class="count-badge" data-list-count>0 levels</span>
+        </div>
+        <div class="empty-state" data-empty-state>
+          <span class="empty-icon" aria-hidden="true">↗</span>
+          <h3>Your list is ready when you are</h3>
+          <p>Search for a level above and add it to start tracking your progress.</p>
+        </div>
+        <div class="tracked-list" data-tracked-list></div>
+      </section>
+    </main>
+
+    <dialog class="progress-dialog" data-progress-dialog aria-labelledby="dialog-title">
+      <form class="form-stack" data-progress-form>
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">UPDATE YOUR RECORD</p>
+            <h2 id="dialog-title">Level progress</h2>
+            <p class="muted" data-dialog-level></p>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close dialog">×</button>
+        </div>
+        <div class="dialog-level-info" data-dialog-info></div>
+        <label for="progress-percent">Best progress (%)</label>
+        <div class="input-suffix">
+          <input id="progress-percent" name="progress" type="number" inputmode="numeric" min="1" max="99" placeholder="For example, 67">
+          <span>%</span>
+        </div>
+        <label class="check-row" for="progress-completed">
+          <input id="progress-completed" name="completed" type="checkbox">
+          <span><strong>Completed</strong><small>Mark this level as beaten (100%).</small></span>
+        </label>
+        <p class="message" data-progress-message role="status" hidden></p>
+        <div class="dialog-actions">
+          <button class="button button--quiet" type="button" data-cancel-dialog>Cancel</button>
+          <button class="button button--primary" type="submit">Save progress</button>
+        </div>
+      </form>
+    </dialog>
+
+    <footer class="site-footer">Level rank, verifier and victor count provided by the <a href="https://aredl.net" target="_blank" rel="noreferrer">All Rated Extreme Demon List</a>. Thumbnails use verification video previews when available.</footer>
+  </body>
+</html>

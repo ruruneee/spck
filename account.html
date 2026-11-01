@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <title>Account · GDTrack</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/account.js"></script>
+  </head>
+  <body data-page="account">
+    <header class="topbar">
+      <a class="brand" href="tracker.html">
+        <span class="brand-mark" aria-hidden="true">GD</span>
+        <span>GDTrack</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a data-nav-page="tracker" href="tracker.html">Tracker</a>
+        <a data-nav-page="account" href="account.html">Account</a>
+      </nav>
+      <div class="user-menu">
+        <span class="user-greeting">Hi, <strong data-current-username></strong></span>
+        <button class="button button--quiet button--small" type="button" data-signout>Sign out</button>
+      </div>
+    </header>
+
+    <main class="page-shell page-shell--narrow">
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">PROFILE & PREFERENCES</p>
+          <h1>Account</h1>
+          <p class="muted">Manage the details for your GDTrack profile.</p>
+        </div>
+      </section>
+
+      <section class="panel account-panel">
+        <div class="section-heading">
+          <div>
+            <h2>Profile details</h2>
+            <p class="muted">Your email is used to sign in and cannot be changed here.</p>
+          </div>
+        </div>
+        <form class="form-stack account-form" data-profile-form>
+          <label for="account-username">Username</label>
+          <input id="account-username" name="username" type="text" minlength="2" maxlength="24" required>
+          <label for="account-email">Email</label>
+          <input id="account-email" name="email" type="email" readonly>
+          <p class="message" data-profile-message role="status" hidden></p>
+          <button class="button button--primary" type="submit">Save username</button>
+        </form>
+      </section>
+
+      <section class="panel account-panel">
+        <div class="section-heading">
+          <div>
+            <h2>Change password</h2>
+            <p class="muted">Choose a new password for this local demo account.</p>
+          </div>
+        </div>
+        <form class="form-stack account-form" data-password-form>
+          <label for="account-password">New password</label>
+          <input id="account-password" name="password" type="password" autocomplete="new-password" minlength="4" placeholder="At least 4 characters" required>
+          <p class="message" data-password-message role="status" hidden></p>
+          <button class="button button--primary" type="submit">Update password</button>
+        </form>
+      </section>
+
+      <aside class="notice">
+        <span aria-hidden="true">ⓘ</span>
+        <p>This school-project demo stores account details, including passwords, in your browser’s local storage. Do not use a real or reused password.</p>
+      </aside>
+    </main>
+    <footer class="site-footer">GDTrack data stays in this browser.</footer>
+  </body>
+</html>
