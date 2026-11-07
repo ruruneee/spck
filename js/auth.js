@@ -10,10 +10,11 @@ if (getCurrentUser()) {
 
 if (loginForm) {
   const message = document.querySelector("[data-auth-message]");
-  loginForm.addEventListener("submit", (event) => {
+  loginForm.addEventListener("submit", function (event) {
     event.preventDefault();
     clearMessage(message);
     const formData = new FormData(loginForm);
+    // FormData reads the values from the named form fields.
     const email = String(formData.get("email")).trim().toLocaleLowerCase();
 
     try {
@@ -27,17 +28,18 @@ if (loginForm) {
 
 if (signupForm) {
   const message = document.querySelector("[data-auth-message]");
-  signupForm.addEventListener("submit", (event) => {
+  signupForm.addEventListener("submit", function (event) {
     event.preventDefault();
     clearMessage(message);
     const formData = new FormData(signupForm);
 
     try {
-      createUser({
+      const accountInfo = {
         username: String(formData.get("username")).trim(),
         email: String(formData.get("email")).trim().toLocaleLowerCase(),
-        password: String(formData.get("password"))
-      });
+        password: String(formData.get("password")),
+      };
+      createUser(accountInfo);
       window.location.assign("tracker.html");
     } catch (error) {
       showMessage(message, error.message);
@@ -45,7 +47,7 @@ if (signupForm) {
   });
 }
 
-window.addEventListener("storage", (event) => {
+window.addEventListener("storage", function (event) {
   if (event.key === "gdtrack.session" && !event.newValue) {
     clearSession();
     window.location.replace("index.html");

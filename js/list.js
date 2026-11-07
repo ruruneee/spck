@@ -22,18 +22,28 @@ if (requireAuth()) {
     card.dataset.loading = "true";
 
     getLevelDetails(level)
-      .then((details) => {
-        Object.assign(level, details);
+      .then(function (details) {
+        const detailNames = Object.keys(details);
+        for (let i = 0; i < detailNames.length; i++) {
+          const name = detailNames[i];
+          level[name] = details[name];
+        }
+
         const thumbnail = card.querySelector(".level-thumbnail");
         thumbnail.setAttribute("aria-label", `${level.name} verification video thumbnail`);
 
         if (level.thumbnail) {
-          thumbnail.querySelector("span:not(.top-level-rank)")?.remove();
+          const placeholder = thumbnail.querySelector("span:not(.top-level-rank)");
+          if (placeholder) {
+            placeholder.remove();
+          }
           const image = document.createElement("img");
           image.src = level.thumbnail;
           image.alt = `${level.name} verification video preview`;
           image.loading = "lazy";
-          image.addEventListener("error", () => image.remove(), { once: true });
+          image.addEventListener("error", function () {
+            image.remove();
+          }, { once: true });
           thumbnail.append(image);
         } else {
           const fallback = thumbnail.querySelector("span:not(.top-level-rank)");
@@ -41,18 +51,30 @@ if (requireAuth()) {
         }
 
         const facts = card.querySelector(".level-facts");
+        let verifierText = "Verifier unavailable";
+        if (level.verifier) {
+          verifierText = "Verifier: " + level.verifier;
+        }
+
+        let victorText = "Victor count unavailable";
+        if (Number.isInteger(level.victors)) {
+          let word = "victors";
+          if (level.victors === 1) {
+            word = "victor";
+          }
+          victorText = level.victors + " " + word;
+        }
+
         facts.replaceChildren(
-          makeTextElement("span", "", level.verifier ? `Verifier: ${level.verifier}` : "Verifier unavailable"),
-          makeTextElement("span", "", Number.isInteger(level.victors)
-            ? `${level.victors} ${level.victors === 1 ? "victor" : "victors"}`
-            : "Victor count unavailable")
+          makeTextElement("span", "", verifierText),
+          makeTextElement("span", "", victorText)
         );
         card.dataset.loaded = "true";
       })
-      .catch(() => {
+      .catch(function () {
         card.querySelector(".level-facts").textContent = "Additional AREDL details unavailable.";
       })
-      .finally(() => {
+      .finally(function () {
         delete card.dataset.loading;
       });
   }
@@ -73,11 +95,14 @@ if (requireAuth()) {
 
     const content = document.createElement("div");
     content.className = "top-level-content";
-    content.append(
-      makeTextElement("h3", "top-level-name", level.name),
-      makeTextElement("p", "top-level-id", level.levelId ? `In-game ID ${level.levelId}` : "In-game ID unavailable"),
-      makeTextElement("div", "level-facts", "Loading verifier and victor count…")
-    );
+    let idText = "In-game ID unavailable";
+    if (level.levelId) {
+      idText = "In-game ID " + level.levelId;
+    }
+
+    content.append(makeTextElement("h3", "top-level-name", level.name));
+    content.append(makeTextElement("p", "top-level-id", idText));
+    content.append(makeTextElement("div", "level-facts", "Loading verifier and victor count…"));
 
     const trackLink = document.createElement("a");
     trackLink.className = "button button--quiet button--small";
@@ -91,37 +116,52 @@ if (requireAuth()) {
   function renderLevels() {
     const query = searchInput.value.trim().toLocaleLowerCase();
     listElement.replaceChildren();
-    const visibleLevels = levels.filter((level) =>
-      level.name.toLocaleLowerCase().includes(query) || level.levelId.includes(query)
-    );
+    const visibleLevels = [];
 
-    visibleLevels.forEach((level) => {
+    for (let i = 0; i < levels.length; i++) {
+      const level = levels[i];
+      const nameMatches = level.name.toLocaleLowerCase().includes(query);
+      const idMatches = level.levelId.includes(query);
+      if (!nameMatches && !idMatches) {
+        continue;
+      }
+
+      visibleLevels.push(level);
       const card = createCard(level);
       listElement.append(card);
       observer.observe(card);
-    });
+    }
 
-    statusElement.textContent = query
-      ? `${visibleLevels.length} of ${levels.length} levels match your search.`
-      : `${levels.length} levels`;
+    if (query) {
+      statusElement.textContent = `${visibleLevels.length} of ${levels.length} levels match your search.`;
+    } else {
+      statusElement.textContent = `${levels.length} levels`;
+    }
   }
 
   searchInput.addEventListener("input", renderLevels);
 
+  // The observer loads extra details only for cards as they come near the screen.
   getTopLevels(150)
-    .then((currentLevels) => {
+    .then(function (currentLevels) {
       levels = currentLevels;
-      observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
+      observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
           observer.unobserve(entry.target);
-          const level = levels.find((item) => item.id === entry.target.dataset.levelKey);
+          let level = null;
+          for (let i = 0; i < levels.length; i++) {
+            if (levels[i].id === entry.target.dataset.levelKey) {
+              level = levels[i];
+              break;
+            }
+          }
           if (level) loadDetails(entry.target, level);
         });
       }, { rootMargin: "250px" });
       renderLevels();
     })
-    .catch((error) => {
+    .catch(function (error) {
       statusElement.textContent = "The current AREDL rankings could not be loaded.";
       errorMessage.textContent = error.message;
       errorState.hidden = false;

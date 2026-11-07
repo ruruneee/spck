@@ -15,10 +15,13 @@ function getVideoThumbnail(videoUrl) {
 
   try {
     const url = new URL(videoUrl);
-    const videoId = url.hostname === "youtu.be"
-      ? url.pathname.slice(1)
-      : url.searchParams.get("v");
-    return videoId ? `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg` : null;
+    let videoId = url.searchParams.get("v");
+    if (url.hostname === "youtu.be") {
+      videoId = url.pathname.slice(1);
+    }
+
+    if (!videoId) return null;
+    return `https://img.youtube.com/vi/${encodeURIComponent(videoId)}/mqdefault.jpg`;
   } catch {
     return null;
   }
@@ -32,53 +35,133 @@ async function loadLevels() {
     throw new Error("The AREDL API returned an unexpected response.");
   }
 
-  levelsCache = levels.map((level) => ({
-    id: String(level.id),
-    name: String(level.name ?? "Unknown level"),
-    position: Number(level.position) || 0,
-    levelId: level.level_id == null ? "" : String(level.level_id)
-  }));
+  levelsCache = [];
+  for (let i = 0; i < levels.length; i++) {
+    const level = levels[i];
+    let name = "Unknown level";
+    if (level.name != null) {
+      name = String(level.name);
+    }
+
+    let levelId = "";
+    if (level.level_id !== null && level.level_id !== undefined) {
+      levelId = String(level.level_id);
+    }
+
+    levelsCache.push({
+      id: String(level.id),
+      name: name,
+      position: Number(level.position) || 0,
+      levelId: levelId,
+    });
+  }
   return levelsCache;
 }
 
 export function getLevelDetails(level) {
   if (detailsCache.has(level.id)) return detailsCache.get(level.id);
 
+  const levelUrl = LEVELS_URL + "/" + encodeURIComponent(level.id);
+  // Both API requests can run at the same time because they do not depend on each other.
   const request = Promise.all([
-    fetchJson(`${LEVELS_URL}/${encodeURIComponent(level.id)}`),
-    fetchJson(`${LEVELS_URL}/${encodeURIComponent(level.id)}/records`)
-  ]).then(([details, records]) => {
-    const verification = details.verifications?.find((item) => item.submitted_by);
-    const verifiedVideo = verification && !verification.hide_video ? verification.video_url : null;
-    const thumbnail = details.thumbnail_url ?? details.thumbnail ?? getVideoThumbnail(verifiedVideo);
+    fetchJson(levelUrl),
+    fetchJson(levelUrl + "/records"),
+  ]).then(function (responses) {
+    const details = responses[0];
+    const records = responses[1];
+    let verification = null;
+
+    if (Array.isArray(details.verifications)) {
+      for (let i = 0; i < details.verifications.length; i++) {
+        if (details.verifications[i].submitted_by) {
+          verification = details.verifications[i];
+          break;
+        }
+      }
+    }
+
+    let verifiedVideo = null;
+    if (verification && !verification.hide_video) {
+      verifiedVideo = verification.video_url;
+    }
+
+    let thumbnail = details.thumbnail_url;
+    if (thumbnail == null) {
+      thumbnail = details.thumbnail;
+    }
+    if (thumbnail == null) {
+      thumbnail = getVideoThumbnail(verifiedVideo);
+    }
+
+    let verifier = null;
+    if (verification && verification.submitted_by) {
+      verifier = verification.submitted_by.global_name;
+      if (verifier == null) {
+        verifier = verification.submitted_by.username;
+      }
+    }
+
+    let safeThumbnail = null;
+    if (typeof thumbnail === "string") {
+      safeThumbnail = thumbnail;
+    }
+
+    let victorCount = null;
+    if (Number.isInteger(records.count)) {
+      victorCount = records.count;
+    }
 
     return {
-      verifier: verification?.submitted_by?.global_name
-        ?? verification?.submitted_by?.username
-        ?? null,
-      thumbnail: typeof thumbnail === "string" ? thumbnail : null,
-      victors: Number.isInteger(records.count) ? records.count : null
+      verifier: verifier,
+      thumbnail: safeThumbnail,
+      victors: victorCount,
     };
   });
 
+  // Keep the request itself so other pages can reuse it while it is still running.
   detailsCache.set(level.id, request);
-  request.catch(() => detailsCache.delete(level.id));
+  request.catch(function () {
+    detailsCache.delete(level.id);
+  });
   return request;
 }
 
 export async function searchLevels(query, limit = 30) {
   const needle = query.trim().toLocaleLowerCase();
-  if (!needle) return [];
+  const resultLimit = Math.floor(limit);
+  if (!needle || !(resultLimit > 0)) return [];
 
   const levels = await loadLevels();
-  return levels
-    .filter((level) => level.name.toLocaleLowerCase().includes(needle) || level.levelId.includes(needle))
-    .slice(0, limit);
+  const results = [];
+
+  for (let i = 0; i < levels.length; i++) {
+    const level = levels[i];
+    const nameMatches = level.name.toLocaleLowerCase().includes(needle);
+    const idMatches = level.levelId.includes(needle);
+
+    if (nameMatches || idMatches) {
+      results.push(level);
+      if (results.length >= resultLimit) {
+        break;
+      }
+    }
+  }
+
+  return results;
 }
 
 export async function getTopLevels(limit = 150) {
   const levels = await loadLevels();
-  return levels
-    .filter((level) => level.position > 0 && level.position <= limit)
-    .sort((a, b) => a.position - b.position);
+  const topLevels = [];
+
+  for (let i = 0; i < levels.length; i++) {
+    if (levels[i].position > 0 && levels[i].position <= limit) {
+      topLevels.push(levels[i]);
+    }
+  }
+
+  topLevels.sort(function (levelA, levelB) {
+    return levelA.position - levelB.position;
+  });
+  return topLevels;
 }
